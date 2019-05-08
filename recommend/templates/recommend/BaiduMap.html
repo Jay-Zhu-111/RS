@@ -1,0 +1,58 @@
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<style type="text/css">
+		body, html,#allmap {width: 100%;height: 90%;overflow: hidden;margin:0;font-family:"微软雅黑";}
+	</style>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ehrGNgygMwfxR6D42PQViy7tvlOOfShe"></script>
+	<title>Recommend With Your Position</title>
+</head>
+
+<body>
+	<div id="allmap"></div>
+    <button id="confirm_btn" onclick="get()">Confirm position</button>
+</body>
+
+</html>
+
+<script type="text/javascript">
+    let latitude;
+    let longitude;
+
+	// 百度地图API功能
+	let map = new BMap.Map("allmap");
+	map.centerAndZoom(new BMap.Point(-118.24, 34.05), 12);
+
+	//开启滚轮缩放
+	map.enableScrollWheelZoom();
+
+	//开启惯性拖拽
+	map.enableContinuousZoom();
+
+	//单击获取点击的经纬度
+	map.addEventListener("click",function(e){
+	    latitude = e.point.lat;
+	    longitude = e.point.lng;
+
+	    //清除之前的点
+	    map.clearOverlays();
+
+	    //创建标记并显示
+	    position_marker = new BMap.Marker(new BMap.Point(longitude, latitude));
+	    map.addOverlay(position_marker);
+
+	    //弹窗写出经纬度
+		alert(e.point.lng + "," + e.point.lat);
+	});
+
+	//点击按钮以提交位置信息
+	function get() {
+	    if (latitude === undefined)
+	        alert("Please choose your position on the map with a click.");
+        else
+            window.location.href = "{% url 'recommend:map' account %}" + latitude
+                + "/" + longitude + "/";
+    }
+</script>

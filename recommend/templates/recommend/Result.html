@@ -1,0 +1,15 @@
+{% if item_list %}
+    <ul>
+        {% for item in item_list %}
+            <li>
+                <a>
+                    {{ item.item_name }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>
+        No results are available.
+    </p>
+{% endif %}
