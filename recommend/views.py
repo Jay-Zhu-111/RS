@@ -4,9 +4,16 @@ from django.shortcuts import render
 from .models import MyUser, MyItem
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from recommend.RecommendModel import RecommendModel
+import random
+import json
 
 recommend_model = RecommendModel()
-
+with open('data/cold_start_user.txt', 'r', encoding='UTF-8') as f:
+    cold_dict = eval(f.read())
+with open('data/user_set.txt', 'r', encoding='UTF-8') as f:
+    user_set = eval(f.read())
+# item_list = list(MyUser.objects.all.values_list(('latitude', 'longitude'), flat=True))
+# print(item_list)
 
 def login(request):
     errors = []
@@ -77,18 +84,49 @@ def register(request):
 
 
 def map_with_baidu(request, account):
-    # return HttpResponse(account)
     return render(request, 'recommend/BaiduMap.html', {'account': account})
 
 
+last_item_list = []
 def show_position(request, account, latitude, longitude):
-    user_list = MyUser.objects.get(user_name=account)
-    rank_list = recommend_model.get_result(user_list.user_name, user_list.L, user_list.S, latitude, longitude)
+    user = MyUser.objects.get(user_name=account)
+    L = eval(user.L)
+    S = eval(user.S)
+    if L.__len__() + S.__len__() == 0:
+        if user.user_name in cold_dict:
+            friend_list = cold_dict[user.user_name]
+            flag = False
+            for i in range(50):
+                friend = str(random.choice(friend_list))
+                if friend in user_set:
+                    user_friend = list(MyUser.objects.filter(user_name=friend)
+                                     .values_list('user_name', flat=True))
+                    if user_friend:
+                        user = MyUser.objects.get(user_name=user_friend[0])
+                        user_id = user_set.index(user.user_name)
+                        L = eval(user.L)
+                        S = eval(user.S)
+                        flag = True
+                        break
+                else:
+                    print('friend not in user_set')
+            if not flag:
+                return HttpResponse('Friends not in database.')
+        else:
+            return HttpResponse('No friendship info.')
+    else:
+        user_id = user_set.index(user.user_name)
+    rank_list = recommend_model.get_result(user_id, L, S, latitude, longitude)
     item_list = []
     for item_id in rank_list:
         item = MyItem.objects.get(item_id=item_id)
         item_list.append(item)
-    return render(request, 'recommend/Result.html', {'item_list': item_list})
+    global last_item_list
+    last_item_list = item_list
+    return render(request, 'recommend/Result.html', {'item_list': item_list,
+                                                     'account': account,
+                                                     'latitude': latitude,
+                                                     'longitude': longitude})
 
     #     # item_list = []
     #     # for item_id in rank_list:
@@ -114,3 +152,25 @@ def show_position(request, account, latitude, longitude):
     #                                                     'la_list': la_list,
     #                                                     'lo_list': lo_list,
     #                                                     'len': name_list.__len__()})
+
+
+def show_result(request, account, latitude, longitude):
+    name_list, la_list, lo_list = [], [], []
+    for item in last_item_list:
+        # item = MyItem.objects.get(item_id=item_id)
+        name_list.append(item.item_name)
+        la_list.append(item.latitude)
+        lo_list.append(item.longitude)
+
+        # name_list += list(MyItem.objects.filter(item_id=item_id)
+        #                  .values_list('item_name', flat=True))
+        # la_list += list(MyItem.objects.filter(item_id=item_id)
+        #                   .values_list('latitude', flat=True))
+        # lo_list += list(MyItem.objects.filter(item_id=item_id)
+        #                   .values_list('longitude', flat=True))
+    return render(request, 'recommend/ResultMap.html', {'name_list': json.dumps(name_list),
+                                                        'la_list': json.dumps(la_list),
+                                                        'lo_list': json.dumps(lo_list),
+                                                        'len': json.dumps(name_list.__len__()),
+                                                        'latitude': json.dumps(latitude),
+                                                        'longitude': json.dumps(longitude)})

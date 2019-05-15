@@ -4,20 +4,27 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 	<style type="text/css">
-		body, html,#allmap {width: 100%;height: 90%;overflow: hidden;margin:0;font-family:"微软雅黑";}
+		body, html,#allmap {width: 100%;height: 100%;overflow: hidden;margin:0;font-family:"微软雅黑";}
 	</style>
 	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ehrGNgygMwfxR6D42PQViy7tvlOOfShe"></script>
 	<title>Recommend With Your Position</title>
 </head>
 
 <body>
-    {{ item.item_name }}
 	<div id="allmap"></div>
 </body>
 
 </html>
 
 <script type="text/javascript">
+    {#let item_list = {{item_list | safe}};#}
+    let name_list = {{name_list | safe}};
+    let la_list = {{la_list | safe}};
+    let lo_list = {{lo_list | safe}};
+    let len = {{ len | safe }};
+    let latitude = {{ latitude | safe }};
+    let longitude = {{ longitude | safe }};
+
 	// 百度地图API功能
 	let map = new BMap.Map("allmap");
 	map.centerAndZoom(new BMap.Point(-118.24, 34.05), 12);
@@ -27,19 +34,19 @@
 
 	//开启惯性拖拽
 	map.enableContinuousZoom();
-	alert('start');
-    {% if item %}
-        alert('get item');
-        {#let text = {{ item.item_name }}#}
-        position_marker = new BMap.Marker(new BMap.Point(-118.214704, 34.10454));
-        mylabel = new BMap.Label('i');
+
+    for (let i = 0; i < len; i++){
+        position_marker = new BMap.Marker(new BMap.Point(lo_list[i], la_list[i]));
+        mylabel = new BMap.Label(name_list[i], {offset:new BMap.Size(20,-10)});
         position_marker.setLabel(mylabel);
         map.addOverlay(position_marker);
-    {% else %}
-        alert('no item input');
-    {% endif %}
-    alert('end');
+    }
 
+    position_marker = new BMap.Marker(new BMap.Point(longitude, latitude));
+    mylabel = new BMap.Label("Your Position", {offset:new BMap.Size(20,-10)});
+    position_marker.setLabel(mylabel);
+    map.addOverlay(position_marker);
+    position_marker.setAnimation(BMAP_ANIMATION_BOUNCE);
 
     {#//创建标记并显示#}
     {#{% for item in item_list %}#}

@@ -27,8 +27,6 @@ class RecommendModel:
         return dis
 
     def get_result(self, user, L, S, latitude, longitude):
-        user = int(user)
-
         # 只计算离当前位置最近的前200个地点
         item_db = MyItem.objects.all()
         dic = {}
@@ -37,8 +35,6 @@ class RecommendModel:
             dic[item.item_id] = dis
         item_set = heapq.nsmallest(self.dis_topK, dic, key=dic.get)
 
-        L = eval(L)
-        S = eval(S)
         map_item_score = {}
         user_var, L_var, S_var = [], [], []
         for i in range(0, item_set.__len__()):

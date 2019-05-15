@@ -1,0 +1,4 @@
+﻿	supersized-init.js控制主页背景轮播
+	scripts.js判断用户名及密码是否为空
+	style.css定义格式   及下面的小东西的链接
+	supersized.3.2.7.min.js背景轮播及其他图的控制

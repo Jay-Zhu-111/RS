@@ -1,8 +1,22 @@
-<html>
-<head>
-    <title>Welcome Register New Account</title>
-</head>
-<body>
+{% load staticfiles %}
+<html lang="en" class="no-js">
+
+    <head>
+
+        <meta charset="utf-8">
+        <title>Welcome Register New Account</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="">
+		<meta name="renderer" content="webkit">
+
+        <!-- CSS 样式引用-->
+        <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=PT+Sans:400,700'>
+        <link rel="stylesheet" href="{% static 'recommend/assets/css/reset.css' %}">
+        <link rel="stylesheet" href="{% static 'recommend/assets/css/supersized.css' %}">
+        <link rel="stylesheet" href="{% static 'recommend/assets/css/style.css' %}">
+    </head>
+<body style="background-image: url({% static 'recommend/assets/img/backgrounds/3.gif'%}); background-size: cover">
 
  {% if errors %}
         <li>
@@ -13,40 +27,25 @@
               {% endfor %}
         </li>
     {% endif %}
-<table>
+<div class="page-container">
     {% csrf_token %}
     <form action="" method="post">
         {% csrf_token %}
-        <tr>
-            <td>
-                <label >Account:</label>
-            </td>
-            <td>
-                <input type = 'text' placeholder="Please input account" name = 'account'>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <label >Password:</label>
-            </td>
-            <td>
-              <input type = 'password' placeholder="Please input password" name = 'password'>
-            </td>
-        </tr>
-         <tr>
-             <td>
-                <label >Password:</label>
-             </td>
-             <td>
-                 <input type = 'password' placeholder="Please input password" name ='password2'>
-             </td>
-         </tr>
-         <tr>
-              <td>
-                   <input type = 'submit' placeholder="Register" value="Register">
-              </td>
-          </tr>
+			<input type = 'text' placeholder="Please input account" name = 'account' id="uid" class="username">
+            <input type = 'password' placeholder="Please input password" name = 'password' id="pwd" class="password">
+            <input type = 'password' placeholder="Please input password" name ='password2' id="pwd" class="password">
+			<button type="submit" id="btn">Register</button>
+            <div class="error"><span>+</span></div>
     </form>
-</table>
+</div>
+{#		<!-- Javascript -->#}
+{#        <script src="assets/js/jquery-1.8.2.min.js"></script>#}
+{#        <script src="assets/js/supersized.3.2.7.min.js"></script>#}
+{#        <script src="assets/js/supersized-init.js"></script>#}
+{#        <script src="assets/js/scripts.js"></script>#}
+		<!-- supersized-init.js控制主页背景轮播 -->
+		<!-- scripts.js判断用户名及密码是否为空 -->
+		<!-- style.css定义格式   及下面的小东西的链接 -->
+		<!-- supersized.3.2.7.min.js背景轮播及其他图的控制 -->
 </body>
 </html>
